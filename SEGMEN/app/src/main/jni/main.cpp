@@ -14,8 +14,6 @@
 #define LOG_TAG "FaceDetection/DetectionBasedTracker"
 #define LOGD(...) ((void)__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__))
 
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -274,5 +272,67 @@ struct DetectorAgregator
         }
         LOGD("Java_org_opencv_samples_facedetect_DetectionBasedTracker_nativeDetect END");
     }
+    JNIEXPORT void JNICALL Java_com_example_dedoo_segmen_DetectionBasedTracker_nativeWatershed
+        (JNIEnv *, jclass, jint x1, jint y1, jint x2, jint y2, jlong inputImage, jlong outputImage )
+    {
+        Mat &matImageRGB = *(Mat *)inputImage;
+        /*
+        // markerMask is 1ch gray image -> set to 0/1 to show lines
+        // imgGray is    3ch gray image
+        Mat markerMask, imgGray;
+        cvtColor(matImageRGB, markerMask, CV_RGB2GRAY);
+        cvtColor(markerMask, imgGray, CV_GRAY2BGR);
+        markerMask = Scalar::all(0);
 
+        int i, j, compCount = 0;
+        std::vector<std::vector<cv::Point> > contours; // vector of marker points
+        std::vector<Vec4i> hierarchy;
+        Scalar color(255);
+
+        // line 1
+        line(markerMask, Point((int)(x1 + (x2-x1)/4 ), (int)(y1 + (y2-y1)/4 )), Point((int)(x2- (x2-x1)/4 ), (int)(y1 + (y2-y1)/4 )), color, 3 );
+        // line 2
+        line(markerMask, Point((int)(x1 + (x2-x1)/4 ), (2*y1 - y2)),            Point((int)(x2- (x2-x1)/4 ), (2*y1 - y2)),            color, 3 );
+
+        //markerMask 에 drawLIne한 뒤 찾으면 됨!
+        findContours(markerMask, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);
+
+        Mat markers(markerMask.size(), CV_32S);
+        markers = Scalar::all(0);
+        int idx = 0;
+        for (; idx >= 0; idx = hierarchy[idx][0], compCount++)
+            drawContours(markers, contours, idx, Scalar::all(compCount + 1), -1, 8, hierarchy, INT_MAX);
+
+        vector<Vec3b> colorTab;
+        for (i = 0; i < compCount; i++)
+        {
+            int b = theRNG().uniform(0, 255);
+            int g = theRNG().uniform(0, 255);
+            int r = theRNG().uniform(0, 255);
+
+            colorTab.push_back(Vec3b((uchar)b, (uchar)g, (uchar)r));
+        }
+
+        Mat wshed(markers.size(), CV_8UC3);
+
+        watershed(matImageRGB, markers);
+
+        for (i = 0; i < markers.rows; i++)
+            for (j = 0; j < markers.cols; j++)
+            {
+                int index = markers.at<int>(i, j);
+                if (index == -1)
+                    wshed.at<Vec3b>(i, j) = Vec3b(255, 255, 255);
+                else if (index <= 0 || index > compCount)
+                    wshed.at<Vec3b>(i, j) = Vec3b(0, 0, 0);
+                else
+                    wshed.at<Vec3b>(i, j) = colorTab[index - 1];
+            }
+
+        wshed = wshed*0.5 + imgGray*0.5;
+        */
+        Mat wshed(matImageRGB.size(), CV_8UC3);
+        wshed = Scalar::all(128);
+        *(Mat *)outputImage=wshed;
+    }
 }

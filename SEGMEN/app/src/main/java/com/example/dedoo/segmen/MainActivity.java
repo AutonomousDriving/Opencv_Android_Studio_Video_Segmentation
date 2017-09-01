@@ -15,6 +15,7 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -47,7 +48,6 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
-
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity
 
     private Mat                    mRgba;
     private Mat                    mGray;
+    private Mat                    mRgbaOut;
     private File                   mCascadeFile;
     private CascadeClassifier      mJavaDetector;
     private DetectionBasedTracker  mNativeDetector;
@@ -105,6 +106,7 @@ public class MainActivity extends AppCompatActivity
 
     private float                  mRelativeFaceSize   = 0.2f;
     private int                    mAbsoluteFaceSize   = 0;
+    private int                    mAbsoluteFaceSize2   = 1;
 
     public native void ConvertRGBtoGray(long matAddrInput, long matAddrResult);
 
@@ -129,7 +131,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
     };
-*/
+    */
     private BaseLoaderCallback  mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
@@ -251,12 +253,14 @@ public class MainActivity extends AppCompatActivity
     public void onCameraViewStarted(int width, int height) {
         mGray = new Mat();
         mRgba = new Mat();
+        mRgbaOut = new Mat();
     }
 
     @Override
     public void onCameraViewStopped() {
         mGray.release();
         mRgba.release();
+        mRgbaOut.release();
     }
 
     @Override
@@ -264,6 +268,10 @@ public class MainActivity extends AppCompatActivity
 
         mRgba = inputFrame.rgba();
         mGray = inputFrame.gray();
+        Size szDownScaling = new Size(mRgba.cols()/4, mRgba.rows()/4);
+
+        Imgproc.resize(mGray, mGray, szDownScaling , 0, 0, Imgproc.INTER_LINEAR);
+        Imgproc.resize(mRgba, mRgba, szDownScaling , 0, 0, Imgproc.INTER_LINEAR);
 
         if (mAbsoluteFaceSize == 0) {
             int height = mGray.rows();
@@ -289,11 +297,25 @@ public class MainActivity extends AppCompatActivity
         }
 
         Rect[] facesArray = faces.toArray();
-        for (int i = 0; i < facesArray.length; i++)
-            Imgproc.rectangle(mRgba, facesArray[i].tl(), facesArray[i].br(), FACE_RECT_COLOR, 3);
+        for (int i = 0; i < facesArray.length; i++) {
+            Point tl=facesArray[i].tl();
+            Point br=facesArray[i].br();
+            tl.x*=4;
+            tl.y*=4;
+            br.x*=4;
+            br.y*=4;
 
+            //mNativeDetector.watershed((int)tl.x, (int)tl.y, (int)br.x, (int)br.y, mRgba, mRgbaOut);
+            Imgproc.rectangle(mRgba, tl, br, FACE_RECT_COLOR, 3);
+        }
         return mRgba;
+
         /*
+        Size szUpScaling = new Size(mRgba.cols()*4, mRgba.rows()*4);
+        Imgproc.resize(mRgbaOut, mRgbaOut, szUpScaling , 0, 0, Imgproc.INTER_LINEAR);
+        return mRgbaOut;
+
+
         matInput = inputFrame.rgba();
 
         if ( matResult != null ) matResult.release();
@@ -305,12 +327,9 @@ public class MainActivity extends AppCompatActivity
         */
     }
 
-
-
     //여기서부턴 퍼미션 관련 메소드
     static final int PERMISSIONS_REQUEST_CODE = 1000;
     String[] PERMISSIONS  = {"android.permission.CAMERA"};
-
 
     private boolean hasPermissions(String[] permissions) {
         int result;
@@ -330,27 +349,21 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
         switch(requestCode){
-
             case PERMISSIONS_REQUEST_CODE:
                 if (grantResults.length > 0) {
                     boolean cameraPermissionAccepted = grantResults[0]
                             == PackageManager.PERMISSION_GRANTED;
-
                     if (!cameraPermissionAccepted)
                         showDialogForPermission("앱을 실행하려면 퍼미션을 허가하셔야합니다.");
                 }
                 break;
         }
     }
-
 
     @TargetApi(Build.VERSION_CODES.M)
     private void showDialogForPermission(String msg) {

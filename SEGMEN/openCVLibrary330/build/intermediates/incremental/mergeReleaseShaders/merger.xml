@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="main"><source path="C:\Users\dedoo\AndroidStudioProjects\SEGMEN\openCVLibrary330\src\main\shaders"/></dataSet><dataSet config="release"><source path="C:\Users\dedoo\AndroidStudioProjects\SEGMEN\openCVLibrary330\src\release\shaders"/></dataSet></merger>
+<merger version="3"><dataSet config="main"><source path="C:\Users\dedoo\Documents\GitHub\Opencv_Android_Studio_Video_Segmentation\SEGMEN\openCVLibrary330\src\main\shaders"/></dataSet><dataSet config="release"><source path="C:\Users\dedoo\Documents\GitHub\Opencv_Android_Studio_Video_Segmentation\SEGMEN\openCVLibrary330\src\release\shaders"/></dataSet></merger>

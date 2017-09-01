@@ -32,6 +32,9 @@ public class DetectionBasedTracker {
         nativeDestroyObject(mNativeObj);
         mNativeObj = 0;
     }
+    public void watershed(int x1, int y1, int x2, int y2, Mat inputImage, Mat outputImage){
+        nativeWatershed( mNativeObj, x1, y1, x2, y2, inputImage.getNativeObjAddr(), outputImage.getNativeObjAddr() );
+    }
 
     private long mNativeObj = 0;
 
@@ -41,6 +44,6 @@ public class DetectionBasedTracker {
     private static native void nativeStop(long thiz);
     private static native void nativeSetFaceSize(long thiz, int size);
     private static native void nativeDetect(long thiz, long inputImage, long faces);
-
+    private static native void nativeWatershed(long thiz, int x1, int y1, int x2, int y2, long inputImage, long outputImage );
 
 }

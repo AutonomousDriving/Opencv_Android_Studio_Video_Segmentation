@@ -53,7 +53,11 @@ JNIEXPORT void JNICALL Java_com_example_dedoo_segmen_DetectionBasedTracker_nativ
  * Signature: (JJJ)V
  */
 JNIEXPORT void JNICALL Java_com_example_dedoo_segmen_DetectionBasedTracker_nativeDetect
-  (JNIEnv *, jclass, jlong, jlong, jlong);
+    (JNIEnv *, jclass, jlong, jlong, jlong);
+
+JNIEXPORT void JNICALL Java_com_example_dedoo_segmen_DetectionBasedTracker_nativeWatershed
+        (JNIEnv *, jclass, jint x1, jint y1, jint x2, jint y2, jlong inputImage, jlong outputImage );
+
 
 #ifdef __cplusplus
 }
